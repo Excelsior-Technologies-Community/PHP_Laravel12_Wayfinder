@@ -6,14 +6,14 @@ import {
 } from '@inertiajs/react';
 
 import {
-    store,
+    update,
     index,
 } from '@/actions/App/Http/Controllers/PostController';
 
-export default function Create({ errors }) {
+export default function Edit({ post, errors }) {
 
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
+    const [title, setTitle] = useState(post.title);
+    const [content, setContent] = useState(post.content);
     const [processing, setProcessing] = useState(false);
 
     function submit(e) {
@@ -21,8 +21,8 @@ export default function Create({ errors }) {
 
         setProcessing(true);
 
-        router.post(
-            store(),
+        router.put(
+            update(post.id),
             {
                 title,
                 content,
@@ -35,19 +35,19 @@ export default function Create({ errors }) {
 
     return (
         <>
-            <Head title="Create Post" />
+            <Head title={`Edit - ${post.title}`} />
 
             <div className="min-h-screen bg-gray-100 py-10">
                 <div className="mx-auto max-w-3xl px-4">
 
                     <div className="mb-6">
                         <h1 className="text-3xl font-bold text-gray-800">
-                            Create Post
+                            Edit Post
                         </h1>
 
                         <p className="mt-1 text-gray-500">
-                            Create a new post using the Wayfinder-generated
-                            store route.
+                            Update your post using the Wayfinder-generated
+                            update route.
                         </p>
                     </div>
 
@@ -58,6 +58,7 @@ export default function Create({ errors }) {
                             className="space-y-5"
                         >
 
+                            {/* Title */}
                             <div>
                                 <label className="mb-2 block font-medium text-gray-700">
                                     Title
@@ -80,6 +81,7 @@ export default function Create({ errors }) {
                                 )}
                             </div>
 
+                            {/* Content */}
                             <div>
                                 <label className="mb-2 block font-medium text-gray-700">
                                     Content
@@ -102,23 +104,24 @@ export default function Create({ errors }) {
                                 )}
                             </div>
 
+                            {/* Buttons */}
                             <div className="flex gap-3">
 
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="rounded-lg bg-green-600 px-5 py-2.5 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     {processing
-                                        ? 'Saving...'
-                                        : 'Save Post'}
+                                        ? 'Updating...'
+                                        : 'Update Post'}
                                 </button>
 
                                 <Link
                                     href={index()}
                                     className="rounded-lg bg-gray-500 px-5 py-2.5 font-medium text-white transition hover:bg-gray-600"
                                 >
-                                    Back
+                                    Cancel
                                 </Link>
 
                             </div>
@@ -131,4 +134,3 @@ export default function Create({ errors }) {
         </>
     );
 }
-
