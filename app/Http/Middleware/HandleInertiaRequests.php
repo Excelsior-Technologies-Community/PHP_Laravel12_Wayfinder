@@ -9,8 +9,6 @@ class HandleInertiaRequests extends Middleware
 {
     /**
      * The root template that is loaded on the first page visit.
-     *
-     * @var string
      */
     protected $rootView = 'app';
 
@@ -31,8 +29,14 @@ class HandleInertiaRequests extends Middleware
     {
         return [
             ...parent::share($request),
+
             'auth' => [
                 'user' => $request->user(),
+            ],
+
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
         ];
     }

@@ -6,45 +6,175 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-// Controller responsible for handling Post CRUD operations
 class PostController extends Controller
 {
-    // Display all posts on the index page
-    public function index()
+    /**
+     * Display posts with search, filtering, sorting and pagination.
+     */
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+        $sort = $request->input('sort', 'latest');
+
+        $query = Post::query();
+
+        // Search by title or content
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('content', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Sorting
+        match ($sort) {
+            'oldest' => $query->oldest(),
+            'title_asc' => $query->orderBy('title', 'asc'),
+            'title_desc' => $query->orderBy('title', 'desc'),
+            default => $query->latest(),
+        };
+
+        $posts = $query
+            ->paginate(6)
+            ->withQueryString();
+
         return Inertia::render('Posts/Index', [
-            'posts' => Post::latest()->get() // Fetch latest posts from database
+            'posts' => $posts,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort,
+            ],
         ]);
     }
 
-    // Show the create post form
+    /**
+     * Display post statistics dashboard.
+     */
+    public function statistics()
+    {
+        $totalPosts = Post::count();
+
+        $todayPosts = Post::whereDate(
+            'created_at',
+            today()
+        )->count();
+
+        $thisWeekPosts = Post::whereBetween(
+            'created_at',
+            [
+                now()->startOfWeek(),
+                now()->endOfWeek(),
+            ]
+        )->count();
+
+        $thisMonthPosts = Post::whereMonth(
+            'created_at',
+            now()->month
+        )
+            ->whereYear(
+                'created_at',
+                now()->year
+            )
+            ->count();
+
+        $latestPost = Post::latest()->first();
+
+        $averageContentLength = round(
+            Post::query()
+                ->selectRaw(
+                    'AVG(CHAR_LENGTH(content)) as average_length'
+                )
+                ->value('average_length') ?? 0
+        );
+
+        $longestPost = Post::orderByRaw(
+            'CHAR_LENGTH(content) DESC'
+        )->first();
+
+        return Inertia::render('Posts/Statistics', [
+            'statistics' => [
+                'total' => $totalPosts,
+                'today' => $todayPosts,
+                'week' => $thisWeekPosts,
+                'month' => $thisMonthPosts,
+                'averageContentLength' => $averageContentLength,
+            ],
+            'latestPost' => $latestPost,
+            'longestPost' => $longestPost,
+        ]);
+    }
+
+    /**
+     * Show the create post form.
+     */
     public function create()
     {
         return Inertia::render('Posts/Create');
     }
 
-    // Store a new post in the database
+    /**
+     * Store a new post.
+     */
     public function store(Request $request)
     {
-        // Validate incoming request data
-        $request->validate([
-            'title' => 'required',
-            'content' => 'required'
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'min:3', 'max:255'],
+            'content' => ['required', 'string', 'min:4'],
         ]);
 
-        // Create a new post record
-        Post::create($request->all());
+        Post::create($validated);
 
-        // Redirect back to posts list page
-        return redirect()->route('posts.index');
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post created successfully.');
     }
 
-    // Delete the selected post
+    /**
+     * Display a single post.
+     */
+    public function show(Post $post)
+    {
+        return Inertia::render('Posts/Show', [
+            'post' => $post,
+        ]);
+    }
+
+    /**
+     * Show the edit post form.
+     */
+    public function edit(Post $post)
+    {
+        return Inertia::render('Posts/Edit', [
+            'post' => $post,
+        ]);
+    }
+
+    /**
+     * Update an existing post.
+     */
+    public function update(Request $request, Post $post)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'min:3', 'max:255'],
+            'content' => ['required', 'string', 'min:4'],
+        ]);
+
+        $post->update($validated);
+
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post updated successfully.');
+    }
+
+    /**
+     * Delete the selected post.
+     */
     public function destroy(Post $post)
     {
         $post->delete();
 
-        // Redirect back to posts list page after deletion
-        return redirect()->route('posts.index');
+        return redirect()
+            ->route('posts.index')
+            ->with('success', 'Post deleted successfully.');
     }
 }
