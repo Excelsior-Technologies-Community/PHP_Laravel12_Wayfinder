@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import {
     Head,
     Link,
@@ -11,9 +12,9 @@ import {
 } from '@/actions/App/Http/Controllers/PostController';
 
 export default function Create({ errors }) {
-
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [featured, setFeatured] = useState(false);
     const [processing, setProcessing] = useState(false);
 
     function submit(e) {
@@ -26,9 +27,11 @@ export default function Create({ errors }) {
             {
                 title,
                 content,
+                featured,
             },
             {
-                onFinish: () => setProcessing(false),
+                onFinish: () =>
+                    setProcessing(false),
             }
         );
     }
@@ -46,8 +49,7 @@ export default function Create({ errors }) {
                         </h1>
 
                         <p className="mt-1 text-gray-500">
-                            Create a new post using the Wayfinder-generated
-                            store route.
+                            Create a new post.
                         </p>
                     </div>
 
@@ -102,12 +104,29 @@ export default function Create({ errors }) {
                                 )}
                             </div>
 
+                            <label className="flex items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    checked={featured}
+                                    onChange={(e) =>
+                                        setFeatured(
+                                            e.target.checked
+                                        )
+                                    }
+                                    className="h-5 w-5 rounded border-gray-300"
+                                />
+
+                                <span className="font-medium text-gray-700">
+                                    Mark as Featured Post
+                                </span>
+                            </label>
+
                             <div className="flex gap-3">
 
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="rounded-lg bg-green-600 px-5 py-2.5 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="rounded-lg bg-green-600 px-5 py-2.5 font-medium text-white hover:bg-green-700 disabled:opacity-50"
                                 >
                                     {processing
                                         ? 'Saving...'
@@ -116,7 +135,7 @@ export default function Create({ errors }) {
 
                                 <Link
                                     href={index()}
-                                    className="rounded-lg bg-gray-500 px-5 py-2.5 font-medium text-white transition hover:bg-gray-600"
+                                    className="rounded-lg bg-gray-500 px-5 py-2.5 font-medium text-white hover:bg-gray-600"
                                 >
                                     Back
                                 </Link>
@@ -131,4 +150,3 @@ export default function Create({ errors }) {
         </>
     );
 }
-

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import {
     Head,
     Link,
@@ -11,10 +12,20 @@ import {
 } from '@/actions/App/Http/Controllers/PostController';
 
 export default function Edit({ post, errors }) {
+    const [title, setTitle] = useState(
+        post.title
+    );
 
-    const [title, setTitle] = useState(post.title);
-    const [content, setContent] = useState(post.content);
-    const [processing, setProcessing] = useState(false);
+    const [content, setContent] = useState(
+        post.content
+    );
+
+    const [featured, setFeatured] = useState(
+        Boolean(post.featured)
+    );
+
+    const [processing, setProcessing] =
+        useState(false);
 
     function submit(e) {
         e.preventDefault();
@@ -26,9 +37,11 @@ export default function Edit({ post, errors }) {
             {
                 title,
                 content,
+                featured,
             },
             {
-                onFinish: () => setProcessing(false),
+                onFinish: () =>
+                    setProcessing(false),
             }
         );
     }
@@ -46,8 +59,7 @@ export default function Edit({ post, errors }) {
                         </h1>
 
                         <p className="mt-1 text-gray-500">
-                            Update your post using the Wayfinder-generated
-                            update route.
+                            Update your post.
                         </p>
                     </div>
 
@@ -58,7 +70,6 @@ export default function Edit({ post, errors }) {
                             className="space-y-5"
                         >
 
-                            {/* Title */}
                             <div>
                                 <label className="mb-2 block font-medium text-gray-700">
                                     Title
@@ -70,8 +81,7 @@ export default function Edit({ post, errors }) {
                                     onChange={(e) =>
                                         setTitle(e.target.value)
                                     }
-                                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                    placeholder="Enter post title"
+                                    className="w-full rounded-lg border border-gray-300 px-4 py-3"
                                 />
 
                                 {errors?.title && (
@@ -81,7 +91,6 @@ export default function Edit({ post, errors }) {
                                 )}
                             </div>
 
-                            {/* Content */}
                             <div>
                                 <label className="mb-2 block font-medium text-gray-700">
                                     Content
@@ -93,8 +102,7 @@ export default function Edit({ post, errors }) {
                                     onChange={(e) =>
                                         setContent(e.target.value)
                                     }
-                                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                                    placeholder="Enter post content"
+                                    className="w-full rounded-lg border border-gray-300 px-4 py-3"
                                 />
 
                                 {errors?.content && (
@@ -104,13 +112,29 @@ export default function Edit({ post, errors }) {
                                 )}
                             </div>
 
-                            {/* Buttons */}
+                            <label className="flex items-center gap-3">
+                                <input
+                                    type="checkbox"
+                                    checked={featured}
+                                    onChange={(e) =>
+                                        setFeatured(
+                                            e.target.checked
+                                        )
+                                    }
+                                    className="h-5 w-5 rounded border-gray-300"
+                                />
+
+                                <span className="font-medium text-gray-700">
+                                    Featured Post
+                                </span>
+                            </label>
+
                             <div className="flex gap-3">
 
                                 <button
                                     type="submit"
                                     disabled={processing}
-                                    className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                    className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                                 >
                                     {processing
                                         ? 'Updating...'
@@ -119,7 +143,7 @@ export default function Edit({ post, errors }) {
 
                                 <Link
                                     href={index()}
-                                    className="rounded-lg bg-gray-500 px-5 py-2.5 font-medium text-white transition hover:bg-gray-600"
+                                    className="rounded-lg bg-gray-500 px-5 py-2.5 font-medium text-white"
                                 >
                                     Cancel
                                 </Link>
