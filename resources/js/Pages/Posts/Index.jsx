@@ -257,6 +257,13 @@ export default function Index({
                         <div className="flex flex-wrap gap-2">
 
                             <Link
+                                href="/route-map"
+                                className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700 flex items-center gap-1 shadow-sm"
+                            >
+                                🗺️ Route Map Studio
+                            </Link>
+
+                            <Link
                                 href={statistics()}
                                 className="rounded-lg bg-purple-600 px-4 py-2 font-medium text-white hover:bg-purple-700"
                             >

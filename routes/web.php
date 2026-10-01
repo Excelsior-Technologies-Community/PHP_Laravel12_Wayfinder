@@ -2,8 +2,30 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\RouteMapController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+/*
+|--------------------------------------------------------------------------
+| Interactive Route Map & Wayfinder TypeScript Studio
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/route-map', [
+    RouteMapController::class,
+    'index',
+])->name('route-map.index');
+
+Route::get('/route-map/export-ts', [
+    RouteMapController::class,
+    'exportTypescript',
+])->name('route-map.export-ts');
+
+Route::post('/route-map/benchmark', [
+    RouteMapController::class,
+    'benchmark',
+])->name('route-map.benchmark');
 
 /*
 |--------------------------------------------------------------------------
